@@ -14,13 +14,16 @@ import (
 var buf = make([]byte, 512)
 var defaultUser string
 var defaultPass string
+var openAuth bool
 
 func main() {
 	//log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	level := cob.InitSlog()
 	level.Set(slog.LevelInfo)
+	level.Set(slog.LevelDebug)
 
 	var port int
+	flag.BoolVar(&openAuth, "a", false, "开启认证模式")
 	flag.StringVar(&defaultUser, "u", "hello", "用户名")
 	flag.StringVar(&defaultPass, "p", "world", "密码")
 	flag.IntVar(&port, "P", 7757, "端口")
@@ -56,7 +59,12 @@ func process(conn net.Conn) {
 		conn.Close()
 		return
 	}
-	reply := []byte{0x05, 0x02}
+	var reply []byte
+	if openAuth {
+		reply = []byte{0x05, 0x02}
+	} else {
+		reply = []byte{0x05, 0x00}
+	}
 	slog.Debug("一次交互", "read", buf[:n], "reply", reply)
 	n, err = conn.Write(reply)
 	if n != 2 || err != nil {
@@ -66,29 +74,32 @@ func process(conn net.Conn) {
 	}
 
 	// 第二次交互
-	n, err = conn.Read(buf)
-	if buf[0] != 0x01 || err != nil {
-		slog.Error("read err", "error", err.Error())
-		conn.Close()
-		return
-	}
-	reply = []byte{0x01, 0x00}
-	slog.Debug("二次交互", "read", buf[:n], "reply", reply)
-	userLen := buf[1]
-	user := string(buf[2 : 2+userLen])
-	passLen := buf[2+userLen]
-	pass := string(buf[3+userLen : 3+userLen+passLen])
-	if user != defaultUser || pass != defaultPass {
-		slog.Error("认证错误", "用户", user, "密码", pass)
-		conn.Close()
-		return
-	}
-	// 认证
-	n, err = conn.Write(reply)
-	if err != nil || n != 2 {
-		slog.Error("write err", "error", err.Error())
-		conn.Close()
-		return
+	var user, pass string
+	if openAuth {
+		n, err = conn.Read(buf)
+		if buf[0] != 0x01 || err != nil {
+			slog.Error("read err", "error", err.Error())
+			conn.Close()
+			return
+		}
+		reply = []byte{0x01, 0x00}
+		slog.Debug("二次交互", "read", buf[:n], "reply", reply)
+		userLen := buf[1]
+		user = string(buf[2 : 2+userLen])
+		passLen := buf[2+userLen]
+		pass = string(buf[3+userLen : 3+userLen+passLen])
+		if user != defaultUser || pass != defaultPass {
+			slog.Error("认证错误", "用户", user, "密码", pass)
+			conn.Close()
+			return
+		}
+		// 认证
+		n, err = conn.Write(reply)
+		if err != nil || n != 2 {
+			slog.Error("write err", "error", err.Error())
+			conn.Close()
+			return
+		}
 	}
 
 	// 第三次交互
