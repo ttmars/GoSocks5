@@ -20,7 +20,7 @@ func main() {
 	//log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	level := cob.InitSlog()
 	level.Set(slog.LevelInfo)
-	level.Set(slog.LevelDebug)
+	//level.Set(slog.LevelDebug)
 
 	var port int
 	flag.BoolVar(&openAuth, "a", false, "开启认证模式")

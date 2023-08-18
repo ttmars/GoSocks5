@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	pu, err := url.Parse("socks5://127.0.0.1:7757")
-	//pu, err := url.Parse("socks5://hello:world@127.0.0.1:7757")
+	//pu, err := url.Parse("socks5://127.0.0.1:23333")
+	pu, err := url.Parse("socks5://hello:world@127.0.0.1:23333")
 	//pu, err := url.Parse("socks5://hello:world@39.101.203.25:8881")
 	//pu, err := url.Parse("socks5://hello:world@47.245.90.149:7757")
 
