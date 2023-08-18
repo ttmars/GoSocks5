@@ -150,7 +150,7 @@ func process(conn net.Conn) {
 	t2 := time.Now()
 
 	// 代理流量
-	dstConn.SetReadDeadline(time.Now().Add(time.Second * 3)) // 有必要？
+	//dstConn.SetReadDeadline(time.Now().Add(time.Second * 3)) // 有必要？
 	Socks5Forward(conn, dstConn)
 	t3 := time.Now()
 	slog.Info("统计", "host", host, "用户名", user, "密码", pass, "认证耗时", t2.Sub(t1), "转发耗时", t3.Sub(t2))
