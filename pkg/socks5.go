@@ -31,7 +31,7 @@ func NewSocks5(port int, openAuth bool, user string, pass string, logLevel slog.
 }
 
 var DefaultSocks5 = &Socks5{
-	Port:        23333,
+	Port:        8890,
 	OpenAuth:    false,
 	User:        "hello",
 	Pass:        "world",

@@ -19,7 +19,7 @@ func run1() {
 	var SaveLogFile bool
 	var User string
 	var Pass string
-	flag.IntVar(&Port, "P", 23333, "端口")
+	flag.IntVar(&Port, "P", 8890, "端口")
 	flag.IntVar(&DialTimeout, "t", 10, "拨号超时")
 	flag.IntVar(&LogLevel, "e", -4, "日志等级,-4/0/4/8")
 	flag.BoolVar(&OpenAuth, "a", false, "是否开启认证")
