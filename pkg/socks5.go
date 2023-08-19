@@ -131,16 +131,15 @@ func (s *Socks5) process(conn net.Conn) {
 	slog.Debug("thirdly dialogue", "read", buf[:n], "reply", reply)
 	switch buf[3] {
 	case 0x01:
-		//ipv4
-		slog.Error("unsupported ipv4")
-		conn.Close()
-		return
+		//ipv4,4byte
+		address = fmt.Sprintf("%d.%d.%d.%d", buf[4], buf[5], buf[6], buf[7])
+		port = binary.BigEndian.Uint16(buf[8:10])
 	case 0x03:
-		//domain
+		//domain,buf[4] is length
 		address = string(buf[5 : 5+buf[4]])
 		port = binary.BigEndian.Uint16(buf[n-2 : n])
 	case 0x04:
-		// ipv6
+		// ipv6,16byte
 		slog.Error("unsupported ipv6")
 		conn.Close()
 		return
